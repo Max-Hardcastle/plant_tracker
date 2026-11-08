@@ -49,4 +49,17 @@ async def delete_plant(plant_id: int, db:db_dependency):
    db.commit()
    return "Plant Deleted"
 
+@app.put("/plants/{plant_id}", response_model=str)
+async def update_plant(plant_id: int, updated_plant: schemas.PlantUpdate, db:db_dependency):
+   db_plant = db.query(models.Plants).filter(models.Plants.id == plant_id).first()
+   if not db_plant:
+      raise HTTPException(status_code=404, detail="Plant not found")
+   for key, value in updated_plant.model_dump().items():
+      setattr(db_plant, key, value)
+   db.commit()
+   db.refresh(db_plant)
+   return "Plant Amended"
+
+
+
 
